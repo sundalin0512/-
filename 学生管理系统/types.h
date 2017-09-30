@@ -2,8 +2,10 @@
 
 typedef struct Student
 {
-	char ID[32];
-	char name[32];
+	char *ID;
+	char *name;
+	char *telephone;
+	char *grade_C;
 	union Birthday
 	{
 		struct
@@ -14,6 +16,4 @@ typedef struct Student
 		};
 		int data[3];
 	};
-	char telephone[32];
-	char grade_C[32];
 }Student;

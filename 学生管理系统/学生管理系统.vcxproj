@@ -111,7 +111,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="manage.h" />
+    <ClInclude Include="storage.h" />
+    <ClInclude Include="storageIO.h" />
     <ClInclude Include="types.h" />
+    <ClInclude Include="view.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="manage.c" />
+    <ClCompile Include="storage.c" />
+    <ClCompile Include="storageIO.c" />
+    <ClCompile Include="view.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

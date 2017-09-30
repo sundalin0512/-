@@ -18,5 +18,31 @@
     <ClInclude Include="types.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="view.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="storageIO.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="storage.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="manage.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="storageIO.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="view.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="storage.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="manage.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
