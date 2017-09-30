@@ -1,5 +1,14 @@
 #pragma once
 
+enum ModifyFlag
+{
+	ModifyFlag_Id = 0x01,
+	ModifyFlag_name = 0x20,
+	ModifyFlag_telephone = 0x40,
+	ModifyFlag_gradeC = 0x80,
+	ModifyFlag_birthday = 0x10
+};
+
 typedef struct Student
 {
 	char *ID;
@@ -16,4 +25,5 @@ typedef struct Student
 		};
 		int data[3];
 	};
+	int modifyFlag;
 }Student;

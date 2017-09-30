@@ -74,7 +74,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -118,6 +118,7 @@
     <ClInclude Include="view.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="main.c" />
     <ClCompile Include="manage.c" />
     <ClCompile Include="storage.c" />
     <ClCompile Include="storageIO.c" />
