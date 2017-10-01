@@ -179,7 +179,7 @@ int FindEmptyPlace(const size_t size, UnusedList *tagList)
 	int i = 0;
 	for (i = 0; i < tagList->size; i++)
 	{
-		if (size < tagList->list[i].size)
+		if (size <= tagList->list[i].size)
 		{
 			return i;
 		}
@@ -247,12 +247,20 @@ ReturnType InsertData(FILE *stream, const int index, const void* buffer, const s
 		}
 		// 写数据
 		writePosition += FileWrite(stream, writePosition, buffer, bytesToInsert);
-		// 写已用节点
-		usedList->size += 1;
-		fileinfo->offsetUsed = writePosition;
-		writePosition += FileWrite(stream, writePosition, usedList, usedListSize);
-		writePosition += FileWrite(stream, writePosition, &usedListPosition, sizeof(size_t));
-		writePosition += FileWrite(stream, writePosition, &bytesToInsert, sizeof(size_t));
+		{
+			// TODO: 
+			// 写已用节点
+			size_t writeSize = index *(sizeof(int) + sizeof(size_t)) + sizeof(size_t);
+			char *writeBuffer = (char*)usedList;
+			usedList->size += 1;
+			fileinfo->offsetUsed = writePosition;
+			writePosition += FileWrite(stream, writePosition, usedList, writeSize);
+			writeBuffer += writeSize;
+			writeSize = (usedList->size - index - 1) *(sizeof(int) + sizeof(size_t));
+			writePosition += FileWrite(stream, writePosition, &usedListPosition, sizeof(size_t));
+			writePosition += FileWrite(stream, writePosition, &bytesToInsert, sizeof(size_t));
+			writePosition += FileWrite(stream, writePosition, writeBuffer, writeSize);
+		}
 		// 写未用节点
 		fileinfo->offsetUnused = writePosition;
 		FileWrite(stream, writePosition, unusedList, unusedListSize);

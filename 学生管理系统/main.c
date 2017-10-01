@@ -9,7 +9,7 @@ int main()
 	InsertData(fp, 0, szHello, strlen(szHello) + 1);
 	szHello = "lalala hahaha";
 	InsertData(fp, 0, szHello, strlen(szHello) + 1);
-	DeleteData(fp, 0);
+	DeleteData(fp, 1);
 	InsertData(fp, 0, szHello, strlen(szHello) + 1);
 	DeleteData(fp, 0);
 	DeleteData(fp, 0);
