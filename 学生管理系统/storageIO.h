@@ -1,5 +1,6 @@
 #pragma once
 #include <stdio.h>
+#include "types.h"
 
 /// <summary>
 /// 创建文件，返回文件指针
@@ -37,8 +38,8 @@ size_t GetFileSize(FILE *stream);
 /// <param name="index">索引</param>
 /// <param name="buffer">要写入的数据</param>
 /// <param name="bytesToInsert">要写入的字节数</param>
-/// <returns>插入的索引值，-1表示失败</returns>
-int InsertTag(FILE *stream, int index, void *buffer, size_t bytesToInsert);
+/// <returns> ReturnType <see cref="ReturnType"/> </returns>
+ReturnType InsertData(FILE *stream, const int index, const void* buffer, const size_t bytesToInsert);
 
 /// <summary>
 /// 在索引尾添加数据
@@ -46,14 +47,15 @@ int InsertTag(FILE *stream, int index, void *buffer, size_t bytesToInsert);
 /// <param name="stream">文件指针</param>
 /// <param name="buffer">要写入的数据</param>
 /// <param name="bytesToInsert">要写入的字节数</param>
-/// <returns>插入的索引值，-1表示失败</returns>
-int AppendTag(FILE *stream, void *buffer, size_t bytesToInsert);
+/// <param name="index">返回插入的索引</param>
+/// <returns> ReturnType <see cref="ReturnType"/> </returns>
+ReturnType AppendData(FILE *stream, const void * buffer, const size_t bytesToInsert, int * index);
 
 /// <summary>
 /// 删除指定索引的数据
 /// </summary>
 /// <param name="stream">文件指针</param>
 /// <param name="index">要删除的索引</param>
-/// <returns>成功：0，失败：1</returns>
-int DeleteTag(FILE *stream, int index);
+/// <returns> ReturnType <see cref="ReturnType"/> </returns>
+ReturnType DeleteData(FILE *stream, int index);
 
