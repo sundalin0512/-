@@ -2,30 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct FileInfo
-{
-	size_t fileSize;			// 0x00 文件大小
-	size_t offsetBegin;			// 0x04 本文件开始位置
-	int hasNextFile;			// 0x08 是否有下一个文件
-	int hasPreFile;				// 0x0C 是否有上一个文件
-	char nextFileName[0x20];	// 0x10 下一个文件相对目录
-	char preFileName[0x20];		// 0x30 上一个文件相对目录
-	size_t offsetUsed;			// 0x50 已用节点偏移，在未用节点前
-	size_t offsetUnused;		// 0x54 未用节点偏移，在已用节点后
-	int reserved[2];			// 0x58 保留
-	//void *data;				// 0x60 数据
-}FileInfo;
-
-typedef struct TagList
-{
-	size_t size;	//list的长度
-	struct
-	{
-		int offset;
-		size_t size;
-	}list[1];
-}UsedList, UnusedList;
-
 /// <summary>
 /// 在指定位置写入指定长度数据
 /// </summary>
@@ -34,7 +10,7 @@ typedef struct TagList
 /// <param name="buffer">要写入的数据</param>
 /// <param name="bytesToWrite">要写入的字节数</param>
 /// <returns>成功写入的字节数</returns>
-static size_t FileWrite(FILE *stream, const size_t offsetFromFileStart, const void *buffer, const size_t bytesToWrite)
+size_t FileWrite(FILE *stream, const size_t offsetFromFileStart, const void *buffer, const size_t bytesToWrite)
 {
 	size_t bytesHasWrite = 0;
 	fseek(stream, offsetFromFileStart, SEEK_SET);
@@ -51,7 +27,7 @@ static size_t FileWrite(FILE *stream, const size_t offsetFromFileStart, const vo
 /// <param name="buffer">保存读取的数据，需要有效指针</param>
 /// <param name="bytesToRead">要读取的字节数</param>
 /// <returns>成功读取的字节数</returns>
-static size_t FileRead(FILE *stream, const size_t offsetFromFileStart, void *buffer, const size_t bytesToRead)
+size_t FileRead(FILE *stream, const size_t offsetFromFileStart, void *buffer, const size_t bytesToRead)
 {
 	size_t bytesHasRead = 0;
 	fseek(stream, offsetFromFileStart, SEEK_SET);
