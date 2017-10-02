@@ -10,8 +10,8 @@ typedef struct FileInfo
 	int hasPreFile;				// 0x0C 是否有上一个文件
 	char nextFileName[0x20];	// 0x10 下一个文件相对目录
 	char preFileName[0x20];		// 0x30 上一个文件相对目录
-	size_t offsetUsed;				// 0x50 已用节点偏移，在未用节点前
-	size_t offsetUnused;			// 0x54 未用节点偏移，在已用节点后
+	size_t offsetUsed;			// 0x50 已用节点偏移，在未用节点前
+	size_t offsetUnused;		// 0x54 未用节点偏移，在已用节点后
 	int reserved[2];			// 0x58 保留
 	//void *data;				// 0x60 数据
 }FileInfo;
@@ -277,6 +277,7 @@ ReturnType InsertData(FILE *stream, const int index, const void* buffer, const s
 		size_t unusedListSize = unusedList->size*(sizeof(int) + sizeof(size_t)) + sizeof(size_t);
 		size_t usedListSize = usedList->size*(sizeof(int) + sizeof(size_t)) + sizeof(size_t);
 		size_t additionalSize = sizeof(int) + sizeof(size_t);
+		size_t insertOffset = 0;
 
 		if (writeLength == freeSpaceLength)
 		{
@@ -289,17 +290,16 @@ ReturnType InsertData(FILE *stream, const int index, const void* buffer, const s
 		// 写数据
 		FileWrite(stream, writePosition, buffer, writeLength);
 		// 写已用节点
+		insertOffset = writePosition;
 		writePosition = fileinfo->offsetUsed;
 		usedList->size += 1;
-		fileinfo->offsetUsed = writePosition;
 		writePosition += FileWrite(stream, writePosition, usedList, usedListSize);
-		writePosition += FileWrite(stream, writePosition, &fileinfo->offsetUsed, sizeof(size_t));
+		writePosition += FileWrite(stream, writePosition, &insertOffset, sizeof(size_t));
 		writePosition += FileWrite(stream, writePosition, &bytesToInsert, sizeof(size_t));
 		// 写未用节点
 		fileinfo->offsetUnused = writePosition;
 		if (writeLength == freeSpaceLength)
 		{
-			size_t remaindSize = 0;
 			char *nextWriteBuffer = (char*)unusedList;
 			writeLength = unusedPlaceIndex*(sizeof(int) + sizeof(size_t)) + sizeof(size_t);
 			writePosition += FileWrite(stream, writePosition, unusedList, writeLength);
@@ -310,6 +310,7 @@ ReturnType InsertData(FILE *stream, const int index, const void* buffer, const s
 		else
 		{
 			unusedList->list[unusedPlaceIndex].size -= writeLength;
+			unusedList->list[unusedPlaceIndex].offset += writeLength;
 			FileWrite(stream, writePosition, unusedList, unusedListSize);
 		}
 		// 修改文件头
@@ -341,15 +342,13 @@ ReturnType AppendData(FILE *stream, const void * buffer, const size_t bytesToIns
 /// <param name="stream">文件指针</param>
 /// <param name="index">要删除的索引</param>
 /// <returns> ReturnType <see cref="ReturnType"/> </returns>
-ReturnType DeleteData(FILE *stream, int index)
+ReturnType DeleteData(FILE *stream, const int index)
 {
 	FileInfo *fileinfo = GetFileInfo(stream);
 	size_t size = 0;
 	UnusedList *unusedList = NULL;
 	UsedList *usedList = NULL;
 	size_t writePosition = 0;
-	size_t unusedListSize = 0;
-	size_t usedListSize = 0;
 	size_t unusedBlockOffset = 0;
 	size_t unusedBlockSize = 0;
 	char *writeBuffer = NULL;
@@ -394,7 +393,7 @@ ReturnType DeleteData(FILE *stream, int index)
 	writeBuffer = (char*)usedList;
 	writeBuffer += offset + sizeof(int) + sizeof(size_t);
 	writeLength = usedList->size *(sizeof(int) + sizeof(size_t)) + sizeof(size_t) - offset;
-	
+
 	writePosition += FileWrite(stream, writePosition, writeBuffer, writeLength);
 	// 写未用节点
 	for (unusedListInsertIndex = 0; unusedListInsertIndex < unusedList->size; unusedListInsertIndex++)
@@ -408,20 +407,51 @@ ReturnType DeleteData(FILE *stream, int index)
 	{
 		return RET_ERROR;
 	}
-	fileinfo->offsetUnused = writePosition;
-	unusedListSize = unusedList->size;
-	unusedList->size += 1;
-	writeLength = unusedListInsertIndex*(sizeof(int) + sizeof(size_t)) + sizeof(size_t);
-	writeBuffer = (char*)unusedList;
-	writePosition += FileWrite(stream, writePosition, writeBuffer, writeLength);
-	writeBuffer += writeLength;
-	writePosition += FileWrite(stream, writePosition, &unusedBlockOffset, sizeof(size_t));
-	writePosition += FileWrite(stream, writePosition, &unusedBlockSize, sizeof(size_t));
-	writeLength = (unusedListSize - unusedListInsertIndex)*(sizeof(int) + sizeof(size_t));
-	FileWrite(stream, writePosition, writeBuffer, writeLength);
-	// 修改文件头
+	{
+		// 尝试合并空节点
+		UnusedList *newUnusedList = (UnusedList*)calloc((unusedList->size + 1)*(sizeof(int) + sizeof(size_t)) + sizeof(size_t), 1);
+		int count = 0;
+		if (newUnusedList == NULL)
+		{
+			return RET_NO_HEAP_SPACE;
+		}
+		for (int i = 0; i <= unusedList->size; i++)
+		{
+			if (i != unusedListInsertIndex && i < unusedList->size)
+			{
+				newUnusedList->list[count].offset = unusedList->list[i].offset;
+				newUnusedList->list[count].size = unusedList->list[i].size;
+				count++;
+				continue;
+			}
+			if (i != 0 && newUnusedList->list[count - 1].offset + newUnusedList->list[count - 1].size == unusedBlockOffset)
+			{
+				newUnusedList->list[count - 1].size += unusedBlockSize;
+			}
+			else if(i == unusedListInsertIndex)
+			{
+				newUnusedList->list[count].offset = unusedBlockOffset;
+				newUnusedList->list[count].size = unusedBlockSize;
+				count++;
+			}
+			if (i < unusedList->size)
+				if (newUnusedList->list[count - 1].offset + newUnusedList->list[count - 1].size == unusedList->list[i].offset)
+				{
+					newUnusedList->list[count - 1].size += unusedList->list[i].size;
+				}
+				else
+				{
+					newUnusedList->list[count].offset = unusedList->list[i].offset;
+					newUnusedList->list[count].size = unusedList->list[i].size;
+					count++;
+				}
+		}
+		newUnusedList->size = count;
+		fileinfo->offsetUnused = writePosition;
+		writeLength = newUnusedList->size*(sizeof(int) + sizeof(size_t)) + sizeof(size_t);
+		FileWrite(stream, writePosition, newUnusedList, writeLength);
+	}
 	FileWrite(stream, 0, fileinfo, sizeof(FileInfo));
-	return RET_SUCCESS;
 	return RET_SUCCESS;
 }
 

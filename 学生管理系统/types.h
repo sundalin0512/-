@@ -25,7 +25,7 @@ typedef struct Student
 		};
 		int data[3];
 	};
-	int modifyFlag;
+	//int modifyFlag;
 }Student;
 
 typedef enum ReturnType

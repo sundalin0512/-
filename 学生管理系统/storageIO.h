@@ -57,5 +57,5 @@ ReturnType AppendData(FILE *stream, const void * buffer, const size_t bytesToIns
 /// <param name="stream">文件指针</param>
 /// <param name="index">要删除的索引</param>
 /// <returns> ReturnType <see cref="ReturnType"/> </returns>
-ReturnType DeleteData(FILE *stream, int index);
+ReturnType DeleteData(FILE *stream, const int index);
 
