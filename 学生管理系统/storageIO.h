@@ -49,7 +49,7 @@ ReturnType InsertData(FILE *stream, const int index, const void* buffer, const s
 /// <param name="bytesToInsert">要写入的字节数</param>
 /// <param name="index">返回插入的索引</param>
 /// <returns> ReturnType <see cref="ReturnType"/> </returns>
-ReturnType AppendData(FILE *stream, const void * buffer, const size_t bytesToInsert, int * index);
+ReturnType AppendData(FILE *stream, const void * buffer, const size_t bytesToInsert, int *index);
 
 /// <summary>
 /// 删除指定索引的数据
@@ -59,3 +59,9 @@ ReturnType AppendData(FILE *stream, const void * buffer, const size_t bytesToIns
 /// <returns> ReturnType <see cref="ReturnType"/> </returns>
 ReturnType DeleteData(FILE *stream, const int index);
 
+/// <summary>
+/// 碎片整理
+/// </summary>
+/// <param name="stream">文件指针</param>
+/// <returns> ReturnType <see cref="ReturnType"/> </returns>
+ReturnType Defragment(FILE *stream);

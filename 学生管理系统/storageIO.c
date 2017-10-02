@@ -188,6 +188,48 @@ int FindEmptyPlace(const size_t size, UnusedList *tagList)
 }
 
 /// <summary>
+/// 读取未用节点
+/// </summary>
+/// <param name="stream">文件指针</param>
+/// <param name="fileinfo">文件头信息</param>
+/// <param name="unusedList">返回未用节点列表</param>
+/// <returns> ReturnType <see cref="ReturnType"/> </returns>
+ReturnType GetUnusedList(FILE *stream, const FileInfo *fileinfo, UnusedList **unusedList)
+{
+	size_t size = 0;
+	FileRead(stream, fileinfo->offsetUnused, &size, sizeof(size_t));
+	size = size*(sizeof(int) + sizeof(size_t)) + sizeof(size_t);
+	*unusedList = (UnusedList*)calloc(size, 1);
+	if (*unusedList == NULL)
+	{
+		return RET_NO_HEAP_SPACE;
+	}
+	FileRead(stream, fileinfo->offsetUnused, *unusedList, size);
+	return RET_SUCCESS;
+}
+
+/// <summary>
+/// 读取已用节点
+/// </summary>
+/// <param name="stream">文件指针</param>
+/// <param name="fileinfo">文件头信息</param>
+/// <param name="usedList">返回已用节点列表</param>
+/// <returns> ReturnType <see cref="ReturnType"/> </returns>
+ReturnType GetUsedList(FILE *stream, const FileInfo *fileinfo, UnusedList **usedList)
+{
+	size_t size = 0;
+	FileRead(stream, fileinfo->offsetUsed, &size, sizeof(size_t));
+	size = size*(sizeof(int) + sizeof(size_t)) + sizeof(size_t);
+	*usedList = (UsedList*)calloc(size, 1);
+	if (*usedList == NULL)
+	{
+		return RET_NO_HEAP_SPACE;
+	}
+	FileRead(stream, fileinfo->offsetUsed, *usedList, size);
+	return RET_SUCCESS;
+}
+
+/// <summary>
 /// 在指定索引处添加数据
 /// </summary>
 /// <param name="stream">文件指针</param>
@@ -202,28 +244,20 @@ ReturnType InsertData(FILE *stream, const int index, const void* buffer, const s
 	UnusedList *unusedList = NULL;
 	UsedList *usedList = NULL;
 	int unusedPlaceIndex = 0;
+	ReturnType retValue = RET_SUCCESS;
 
-#pragma region refactor
 	//读取未用节点
-	FileRead(stream, fileinfo->offsetUnused, &size, sizeof(size_t));
-	size = size*(sizeof(int) + sizeof(size_t)) + sizeof(size_t);
-	unusedList = (UnusedList*)calloc(size, 1);
-	if (unusedList == NULL)
+	retValue = GetUnusedList(stream, fileinfo, &unusedList);
+	if (retValue != RET_SUCCESS)
 	{
-		return RET_NO_HEAP_SPACE;
+		return retValue;
 	}
-	FileRead(stream, fileinfo->offsetUnused, unusedList, size);
-
 	//读取已用节点
-	FileRead(stream, fileinfo->offsetUsed, &size, sizeof(size_t));
-	size = size*(sizeof(int) + sizeof(size_t)) + sizeof(size_t);
-	usedList = (UsedList*)calloc(size, 1);
-	if (usedList == NULL)
+	retValue = GetUsedList(stream, fileinfo, &usedList);
+	if (retValue != RET_SUCCESS)
 	{
-		return RET_NO_HEAP_SPACE;
+		return retValue;
 	}
-	FileRead(stream, fileinfo->offsetUsed, usedList, size);
-#pragma endregion
 
 	size = bytesToInsert;
 	if (index > usedList->size)
@@ -331,7 +365,7 @@ ReturnType AppendData(FILE *stream, const void * buffer, const size_t bytesToIns
 {
 	FileInfo *file = GetFileInfo(stream);
 	size_t size = 0;
-	FileRead(stream, file->offsetUnused, &size, sizeof(size_t));
+	FileRead(stream, file->offsetUsed, &size, sizeof(size_t));
 	*index = size;
 	return InsertData(stream, size, buffer, bytesToInsert);
 }
@@ -354,28 +388,21 @@ ReturnType DeleteData(FILE *stream, const int index)
 	char *writeBuffer = NULL;
 	int offset = 0;
 	int unusedListInsertIndex = 0;
+	ReturnType retValue = RET_SUCCESS;
 	size_t writeLength = 0;
-#pragma region refactor2
-	//读取未用节点
-	FileRead(stream, fileinfo->offsetUnused, &size, sizeof(size_t));
-	size = size*(sizeof(int) + sizeof(size_t)) + sizeof(size_t);
-	unusedList = (UnusedList*)calloc(size, 1);
-	if (unusedList == NULL)
-	{
-		return RET_NO_HEAP_SPACE;
-	}
-	FileRead(stream, fileinfo->offsetUnused, unusedList, size);
 
-	//读取已用节点
-	FileRead(stream, fileinfo->offsetUsed, &size, sizeof(size_t));
-	size = size*(sizeof(int) + sizeof(size_t)) + sizeof(size_t);
-	usedList = (UsedList*)calloc(size, 1);
-	if (usedList == NULL)
+	//读取未用节点
+	retValue = GetUnusedList(stream, fileinfo, &unusedList);
+	if (retValue != RET_SUCCESS)
 	{
-		return RET_NO_HEAP_SPACE;
+		return retValue;
 	}
-	FileRead(stream, fileinfo->offsetUsed, usedList, size);
-#pragma endregion
+	//读取已用节点
+	retValue = GetUsedList(stream, fileinfo, &usedList);
+	if (retValue != RET_SUCCESS)
+	{
+		return retValue;
+	}
 	if (index > usedList->size - 1)
 	{
 		return RET_ILLEGAL_INDEX;
@@ -428,7 +455,7 @@ ReturnType DeleteData(FILE *stream, const int index)
 			{
 				newUnusedList->list[count - 1].size += unusedBlockSize;
 			}
-			else if(i == unusedListInsertIndex)
+			else if (i == unusedListInsertIndex)
 			{
 				newUnusedList->list[count].offset = unusedBlockOffset;
 				newUnusedList->list[count].size = unusedBlockSize;
@@ -455,3 +482,77 @@ ReturnType DeleteData(FILE *stream, const int index)
 	return RET_SUCCESS;
 }
 
+/// <summary>
+/// 碎片整理
+/// </summary>
+/// <param name="stream">文件指针</param>
+/// <returns> ReturnType <see cref="ReturnType"/> </returns>
+ReturnType Defragment(FILE *stream)
+{
+	FileInfo *fileinfo = GetFileInfo(stream);
+	UsedList *usedList = NULL;
+	UsedList *ussdListCopy = NULL;
+	ReturnType retValue = RET_SUCCESS;
+	size_t writePosition = sizeof(FileInfo);
+	int usedListSize = 0;
+	int count = 0;
+
+	//读取已用节点
+	retValue = GetUsedList(stream, fileinfo, &usedList);
+	if (retValue != RET_SUCCESS)
+	{
+		return retValue;
+	}
+	//拷贝一份已用节点
+	retValue = GetUsedList(stream, fileinfo, &ussdListCopy);
+	if (retValue != RET_SUCCESS)
+	{
+		return retValue;
+	}
+
+	for (count = 0; count < ussdListCopy->size; count++)
+	{
+		size_t minOffset = 0;
+		size_t minSize = 0;
+		size_t minIndex = 0;
+		void *buffer = NULL;
+		for (size_t i = 0; i < ussdListCopy->size; i++)
+		{
+			if (ussdListCopy->list[i].offset != 0)
+			{
+				if (minOffset == 0)
+				{
+					minOffset = ussdListCopy->list[i].offset;
+					minSize = ussdListCopy->list[i].size;
+					minIndex = i;
+				}
+				else if (minOffset > ussdListCopy->list[i].offset)
+				{
+					minOffset = ussdListCopy->list[i].offset;
+					minSize = ussdListCopy->list[i].size;
+					minIndex = i;
+				}
+			}
+		}
+		buffer = calloc(minSize, 1);
+		if (buffer == NULL)
+		{
+			return RET_NO_HEAP_SPACE;
+		}
+		FileRead(stream, minOffset, buffer, minSize);
+		ussdListCopy->list[minIndex].offset = 0;
+		usedList->list[minIndex].offset = writePosition;
+		writePosition += FileWrite(stream, writePosition, buffer, minSize);
+		free(buffer);
+	}
+	fileinfo->offsetUsed = writePosition;
+	usedListSize = usedList->size*(sizeof(int) + sizeof(size_t)) + sizeof(size_t);
+	writePosition += FileWrite(stream, writePosition, usedList, usedListSize);
+	fileinfo->offsetUnused = writePosition;
+	count = 0;
+	FileWrite(stream, writePosition, &count, sizeof(size_t));
+
+	FileWrite(stream, 0, fileinfo, sizeof(FileInfo));
+
+	return RET_SUCCESS;
+}
