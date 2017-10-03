@@ -56,6 +56,13 @@ void FileClose(FILE *stream);
 size_t GetFileSize(FILE *stream);
 
 /// <summary>
+/// 获取所存储数据的条目数
+/// </summary>
+/// <param name="stream">文件指针</param>
+/// <returns>所存储数据的条目数</returns>
+size_t GetDataNumber(FILE *stream);
+
+/// <summary>
 /// 在指定索引处添加数据
 /// </summary>
 /// <param name="stream">文件指针</param>
@@ -74,6 +81,16 @@ ReturnType InsertData(FILE *stream, const int index, const void* buffer, const s
 /// <param name="index">返回插入的索引</param>
 /// <returns> ReturnType <see cref="ReturnType"/> </returns>
 ReturnType AppendData(FILE *stream, const void * buffer, const size_t bytesToInsert, int *index);
+
+/// <summary>
+/// 根据索引获取文件中的数据
+/// </summary>
+/// <param name="stream">文件指针</param>
+/// <param name="buffer">获取的数据（传出参数）</param>
+/// <param name="bytesHasGet">获取的数据的字节数（传出参数）</param>
+/// <param name="index">要获取的数据的索引</param>
+/// <returns> ReturnType <see cref="ReturnType"/> </returns>
+ReturnType GetData(FILE *stream, void **buffer, size_t *bytesHasGet, const int index);
 
 /// <summary>
 /// 删除指定索引的数据

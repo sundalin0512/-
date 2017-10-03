@@ -1,5 +1,7 @@
 #pragma once
 
+#define MAX_STR_LEN 32
+
 enum ModifyFlag
 {
 	ModifyFlag_Id = 0x01,
@@ -15,16 +17,16 @@ typedef struct Student
 	char *name;
 	char *telephone;
 	char *grade_C;
-	union Birthday
-	{
+	//union Birthday
+	//{
 		struct
 		{
 			int year;
 			int month;
 			int day;
-		};
-		int data[3];
-	};
+		}Birthday;
+	//	int data[3];
+	//};
 	//int modifyFlag;
 }Student;
 

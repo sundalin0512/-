@@ -145,6 +145,19 @@ size_t GetFileSize(FILE *stream)
 }
 
 /// <summary>
+/// 获取所存储数据的条目数
+/// </summary>
+/// <param name="stream">文件指针</param>
+/// <returns>所存储数据的条目数</returns>
+size_t GetDataNumber(FILE * stream)
+{
+	size_t size = 0;
+	FileInfo *fileinfo = GetFileInfo(stream);
+	FileRead(stream, fileinfo->offsetUsed, &size, sizeof(size_t));
+	return size;
+}
+
+/// <summary>
 /// 寻找拥有足够空间的未用节点
 /// </summary>
 /// <param name="size">需要的字节数</param>
@@ -213,7 +226,7 @@ ReturnType GetUsedList(FILE *stream, const FileInfo *fileinfo, UnusedList **used
 /// <param name="buffer">要写入的数据</param>
 /// <param name="bytesToInsert">要写入的字节数</param>
 /// <returns> ReturnType <see cref="ReturnType"/> </returns>
-ReturnType InsertData(FILE *stream, const int index, const void* buffer, const size_t bytesToInsert)
+ReturnType InsertData(FILE *stream, const int index, const void *buffer, const size_t bytesToInsert)
 {
 	FileInfo *fileinfo = GetFileInfo(stream);
 	size_t size = 0;
@@ -337,13 +350,40 @@ ReturnType InsertData(FILE *stream, const int index, const void* buffer, const s
 /// <param name="bytesToInsert">要写入的字节数</param>
 /// <param name="index">返回插入的索引</param>
 /// <returns> ReturnType <see cref="ReturnType"/> </returns>
-ReturnType AppendData(FILE *stream, const void * buffer, const size_t bytesToInsert, int * index)
+ReturnType AppendData(FILE *stream, const void *buffer, const size_t bytesToInsert, int *index)
 {
 	FileInfo *file = GetFileInfo(stream);
 	size_t size = 0;
 	FileRead(stream, file->offsetUsed, &size, sizeof(size_t));
 	*index = size;
 	return InsertData(stream, size, buffer, bytesToInsert);
+}
+
+/// <summary>
+/// 根据索引获取文件中的数据
+/// </summary>
+/// <param name="stream">文件指针</param>
+/// <param name="buffer">获取的数据（传出参数）</param>
+/// <param name="bytesHasGet">获取的数据的字节数（传出参数）</param>
+/// <param name="index">要获取的数据的索引</param>
+/// <returns> ReturnType <see cref="ReturnType"/> </returns>
+ReturnType GetData(FILE *stream, void **buffer, size_t *bytesHasGet, const int index)
+{
+	FileInfo *fileInfo = GetFileInfo(stream);
+	UsedList *usedList = NULL;
+	ReturnType retValue = RET_SUCCESS;
+	size_t size = 0;
+	size_t offset = 0;
+	retValue = GetUsedList(stream, fileInfo, &usedList);
+	if (index >= usedList->size)
+	{
+		return RET_ILLEGAL_INDEX;
+	}
+	size = usedList->list[index].size;
+	offset = usedList->list[index].offset;
+	*buffer = calloc(size, 1);
+	*bytesHasGet = FileRead(stream, offset, *buffer, size);
+	return RET_SUCCESS;
 }
 
 /// <summary>
