@@ -7,6 +7,15 @@
 #include "storageIO.h"
 
 /// <summary>
+/// 创建学生文档文件
+/// </summary>
+/// <param name="fileName">文件名</param>
+/// <param name="fileSize">文件大小字节数</param>
+/// <param name="preFileName">前一个文件的文件名</param>
+/// <returns> ReturnType <see cref="ReturnType"/> </returns>
+ReturnType CreateStudentFile(char *fileName, size_t fileSize, char *preFileName);
+
+/// <summary>
 /// 添加学生信息到文件
 /// </summary>
 /// <param name="fileName">文件名</param>

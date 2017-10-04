@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "CppUnitTest.h"
 extern "C" {
-#include "../学生管理系统/storageIO.h"
-#include "../学生管理系统/storage.h"
+#include "storageIO.h"
+#include "storage.h"
 	extern size_t FileRead(FILE *stream, const size_t offsetFromFileStart, void *buffer, const size_t bytesToRead);
 	extern size_t FileWrite(FILE *stream, const size_t offsetFromFileStart, const void *buffer, const size_t bytesToWrite);
 	//extern ReturnType AddStudent(char *fileName, int index, Student *student);
