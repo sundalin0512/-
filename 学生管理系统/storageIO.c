@@ -109,7 +109,7 @@ FILE *CreateFile(const char *fileName, const size_t sizeBytes, const char *preFi
 }
 
 /// <summary>
-/// 打开文件，返回文件指针
+/// 打开已存在的文件，返回文件指针
 /// </summary>
 /// <param name="fileName">要打开的文件名</param>
 /// <returns>打开的文件指针，失败返回空指针</returns>
@@ -570,5 +570,62 @@ ReturnType Defragment(FILE *stream)
 
 	FileWrite(stream, 0, fileinfo, sizeof(FileInfo));
 
+	return RET_SUCCESS;
+}
+
+/// <summary>
+/// 文件的使用信息
+/// </summary>
+/// <param name="stream">文件指针</param>
+/// <param name="sizeList">返回每个使用空间的长度</param>
+/// <param name="statusList">返回每个使用空间的状态 0：未使用 1：已使用</param>
+/// <param name="listSize">返回List的长度</param>
+/// <returns> ReturnType <see cref="ReturnType"/> </returns>
+ReturnType GetFileStatus(FILE * stream, int ** sizeList, int ** statusList, int * listSize)
+{
+	FileInfo *fileInfo;
+	UnusedList *unusedList;
+	UsedList *usedList;
+	fileInfo = GetFileInfo(stream);
+	GetUnusedList(stream, fileInfo, &unusedList);
+	GetUsedList(stream, fileInfo, &usedList);
+	*listSize = unusedList->size * 2 + 1;
+	*sizeList = (int*)calloc(*listSize, sizeof(int));
+	if (*sizeList == NULL)
+	{
+		return RET_NO_HEAP_SPACE;
+	}
+	*statusList = (int*)calloc(*listSize, sizeof(int));
+	if (*statusList == NULL)
+	{
+		return RET_NO_HEAP_SPACE;
+	}
+	if (unusedList->size > 0)
+	{
+		(*sizeList)[0] = unusedList->list[0].offset - fileInfo->offsetBegin;
+		(*statusList)[0] = 1;
+		for (int i = 1; i < unusedList->size; i++)
+		{
+			(*sizeList)[i * 2 - 1] = unusedList->list[i - 1].size;
+			(*statusList)[i * 2 - 1] = 0;
+			(*sizeList)[i * 2] = unusedList->list[i].offset - unusedList->list[i - 1].offset - unusedList->list[i - 1].size;
+			(*statusList)[i * 2] = 1;
+		}
+
+		(*sizeList)[unusedList->size * 2 - 1] = unusedList->list[unusedList->size - 1].size;
+		(*statusList)[unusedList->size * 2 - 1] = 0;
+		(*sizeList)[unusedList->size * 2] = fileInfo->offsetUsed - unusedList->list[unusedList->size - 1].offset - unusedList->list[unusedList->size - 1].size;
+		(*statusList)[unusedList->size * 2] = 1;
+	}
+	else if(usedList->size >0)
+	{
+		(*sizeList)[0] = fileInfo->offsetUsed - fileInfo->offsetBegin;
+		(*statusList)[0] = 1;
+	}
+	else
+	{
+		(*sizeList)[0] = 0;
+		(*statusList)[0] = 0;
+	}
 	return RET_SUCCESS;
 }

@@ -356,6 +356,202 @@ namespace UnitTest1
 			Assert::AreEqual(0, (int)GetDataNumber(fp));
 		}
 
+		TEST_METHOD(GetFileStatus_Test1)
+		{
+			char *szHello = "00000000000000000";
+			int index = 0;
+			AppendData(fp, szHello, strlen(szHello) + 1, &index);
+			AppendData(fp, szHello, strlen(szHello) + 1, &index);
+			DeleteData(fp, 1);
+			int size[3] = { 18,18,0 };
+			int used[3] = { 1,0,1 };
+			int *sizeList;
+			int *statusList;
+			int ListSize;
+			GetFileStatus(fp, &sizeList, &statusList, &ListSize);
+			Assert::AreEqual(3, ListSize);
+			for (int i = 0; i < 3; i++)
+			{
+				Assert::AreEqual(size[i], sizeList[i]);
+				Assert::AreEqual(used[i], statusList[i]);
+			}
+		}
+
+		TEST_METHOD(GetFileStatus_Test2)
+		{
+			char *szHello = "00000000000000000";
+			int index = 0;
+			AppendData(fp, szHello, strlen(szHello) + 1, &index);
+			int size[3] = { 18 };
+			int used[3] = { 1 };
+			int *sizeList;
+			int *statusList;
+			int ListSize;
+			GetFileStatus(fp, &sizeList, &statusList, &ListSize);
+			Assert::AreEqual(1, ListSize);
+			for (int i = 0; i < 1; i++)
+			{
+				Assert::AreEqual(size[i], sizeList[i]);
+				Assert::AreEqual(used[i], statusList[i]);
+			}
+		}
+		TEST_METHOD(GetFileStatus_Test3)
+		{
+			char *szHello = "00000000000000000";
+			int index = 0;
+			AppendData(fp, szHello, strlen(szHello) + 1, &index);
+			szHello = "11111111111111111";
+			AppendData(fp, szHello, strlen(szHello) + 1, &index);
+			szHello = "2222222222222222222222222222";
+			AppendData(fp, szHello, strlen(szHello) + 1, &index);
+
+
+			szHello = "33333333333333333333333";
+			AppendData(fp, szHello, strlen(szHello) + 1, &index);
+			szHello = "444444444444";
+			AppendData(fp, szHello, strlen(szHello) + 1, &index);
+			szHello = "555555555555555555555555555555555";
+			AppendData(fp, szHello, strlen(szHello) + 1, &index);
+			szHello = "66666666666666666666";
+			AppendData(fp, szHello, strlen(szHello) + 1, &index);
+			szHello = "7";
+			AppendData(fp, szHello, strlen(szHello) + 1, &index);
+			szHello = "8888888888888888888888888888888888888888888";
+			AppendData(fp, szHello, strlen(szHello) + 1, &index);
+
+			szHello = "999999999999999";
+			AppendData(fp, szHello, strlen(szHello) + 1, &index);
+
+			DeleteData(fp, 9);
+
+			DeleteData(fp, 7);
+			DeleteData(fp, 5);
+			DeleteData(fp, 3);
+			DeleteData(fp, 3);
+
+			//Defragment(fp);
+			int size[7] = { 65, 71, 21, 2, 44, 16, 0 };
+			int used[7] = { 1 ,0, 1, 0, 1, 0, 1 };
+			int *sizeList;
+			int *statusList;
+			int ListSize;
+			GetFileStatus(fp, &sizeList, &statusList, &ListSize);
+			Assert::AreEqual(7, ListSize);
+			for (int i = 0; i < 7; i++)
+			{
+				Assert::AreEqual(size[i], sizeList[i]);
+				Assert::AreEqual(used[i], statusList[i]);
+			}
+		}
+
+		TEST_METHOD(GetFileStatus_Test4)
+		{
+			char *szHello = "00000000000000000";
+			int index = 0;
+			AppendData(fp, szHello, strlen(szHello) + 1, &index);
+			szHello = "11111111111111111";
+			AppendData(fp, szHello, strlen(szHello) + 1, &index);
+			szHello = "2222222222222222222222222222";
+			AppendData(fp, szHello, strlen(szHello) + 1, &index);
+
+
+			szHello = "33333333333333333333333";
+			AppendData(fp, szHello, strlen(szHello) + 1, &index);
+			szHello = "444444444444";
+			AppendData(fp, szHello, strlen(szHello) + 1, &index);
+			szHello = "555555555555555555555555555555555";
+			AppendData(fp, szHello, strlen(szHello) + 1, &index);
+			szHello = "66666666666666666666";
+			AppendData(fp, szHello, strlen(szHello) + 1, &index);
+			szHello = "7";
+			AppendData(fp, szHello, strlen(szHello) + 1, &index);
+			szHello = "8888888888888888888888888888888888888888888";
+			AppendData(fp, szHello, strlen(szHello) + 1, &index);
+
+			szHello = "999999999999999";
+			AppendData(fp, szHello, strlen(szHello) + 1, &index);
+
+			DeleteData(fp, 9);
+
+			DeleteData(fp, 7);
+			DeleteData(fp, 5);
+			DeleteData(fp, 3);
+			DeleteData(fp, 3);
+			DeleteData(fp, 0);
+			DeleteData(fp, 0);
+			DeleteData(fp, 0);
+			DeleteData(fp, 0);
+			DeleteData(fp, 0);
+
+			//Defragment(fp);
+			int size[3] = { 0, 65 + 71 + 21 + 2 + 44 + 16,0 };
+			int used[3] = { 1 ,0, 1 };
+			int *sizeList;
+			int *statusList;
+			int ListSize;
+			GetFileStatus(fp, &sizeList, &statusList, &ListSize);
+			Assert::AreEqual(3, ListSize);
+			for (int i = 0; i < 3; i++)
+			{
+				Assert::AreEqual(size[i], sizeList[i]);
+				Assert::AreEqual(used[i], statusList[i]);
+			}
+		}
+
+		TEST_METHOD(GetFileStatus_Test5)
+		{
+			char *szHello = "00000000000000000";
+			int index = 0;
+			AppendData(fp, szHello, strlen(szHello) + 1, &index);
+			szHello = "11111111111111111";
+			AppendData(fp, szHello, strlen(szHello) + 1, &index);
+			szHello = "2222222222222222222222222222";
+			AppendData(fp, szHello, strlen(szHello) + 1, &index);
+
+
+			szHello = "33333333333333333333333";
+			AppendData(fp, szHello, strlen(szHello) + 1, &index);
+			szHello = "444444444444";
+			AppendData(fp, szHello, strlen(szHello) + 1, &index);
+			szHello = "555555555555555555555555555555555";
+			AppendData(fp, szHello, strlen(szHello) + 1, &index);
+			szHello = "66666666666666666666";
+			AppendData(fp, szHello, strlen(szHello) + 1, &index);
+			szHello = "7";
+			AppendData(fp, szHello, strlen(szHello) + 1, &index);
+			szHello = "8888888888888888888888888888888888888888888";
+			AppendData(fp, szHello, strlen(szHello) + 1, &index);
+
+			szHello = "999999999999999";
+			AppendData(fp, szHello, strlen(szHello) + 1, &index);
+
+			DeleteData(fp, 9);
+
+			DeleteData(fp, 7);
+			DeleteData(fp, 5);
+			DeleteData(fp, 3);
+			DeleteData(fp, 3);
+			DeleteData(fp, 0);
+			DeleteData(fp, 0);
+			DeleteData(fp, 0);
+			DeleteData(fp, 0);
+			DeleteData(fp, 0);
+
+			Defragment(fp);
+			int size[1] = { 0};
+			int used[1] = { 0};
+			int *sizeList;
+			int *statusList;
+			int ListSize;
+			GetFileStatus(fp, &sizeList, &statusList, &ListSize);
+			Assert::AreEqual(1, ListSize);
+			for (int i = 0; i < 1; i++)
+			{
+				Assert::AreEqual(size[i], sizeList[i]);
+				Assert::AreEqual(used[i], statusList[i]);
+			}
+		}
+
 	};
 
 	TEST_CLASS(StorageTest)

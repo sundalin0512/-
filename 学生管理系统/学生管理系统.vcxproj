@@ -26,7 +26,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -83,6 +83,9 @@
       <EnablePREfast>true</EnablePREfast>
       <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
+    <Link>
+      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -122,14 +125,14 @@
     <ClInclude Include="storage.h" />
     <ClInclude Include="storageIO.h" />
     <ClInclude Include="types.h" />
-    <ClInclude Include="view.h" />
+    <ClInclude Include="userInterface.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c" />
     <ClCompile Include="manage.c" />
     <ClCompile Include="storage.c" />
     <ClCompile Include="storageIO.c" />
-    <ClCompile Include="view.c" />
+    <ClCompile Include="userInterface.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

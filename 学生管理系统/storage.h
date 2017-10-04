@@ -4,7 +4,6 @@
 #include <stdlib.h>
 
 #include "types.h"
-#include "storageIO.h"
 
 /// <summary>
 /// 创建学生文档文件
@@ -14,6 +13,15 @@
 /// <param name="preFileName">前一个文件的文件名</param>
 /// <returns> ReturnType <see cref="ReturnType"/> </returns>
 ReturnType CreateStudentFile(char *fileName, size_t fileSize, char *preFileName);
+
+/// <summary>
+///	查询文件是否存在
+/// </summary>
+/// <param name="fileName">文件名</param>
+/// <returns>
+/// 存在,返回 <c>1</c> 不存在,返回 <c>0</c>
+/// </returns>
+int IsFileExist(char *fileName);
 
 /// <summary>
 /// 添加学生信息到文件

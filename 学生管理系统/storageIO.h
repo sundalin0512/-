@@ -36,7 +36,7 @@ typedef struct TagList
 FILE *CreateFile(const char *fileName, const size_t sizeBytes, const char *preFileName);
 
 /// <summary>
-/// 打开文件，返回文件指针 
+/// 打开已存在的文件，返回文件指针 
 /// </summary>
 /// <param name="fileName">要打开的文件名</param>
 /// <returns>打开的文件指针，失败返回空指针</returns>
@@ -106,3 +106,13 @@ ReturnType DeleteData(FILE *stream, const int index);
 /// <param name="stream">文件指针</param>
 /// <returns> ReturnType <see cref="ReturnType"/> </returns>
 ReturnType Defragment(FILE *stream);
+
+/// <summary>
+/// 文件的使用信息
+/// </summary>
+/// <param name="stream">文件指针</param>
+/// <param name="sizeList">返回每个使用空间的长度</param>
+/// <param name="statusList">返回每个使用空间的状态 0：未使用 1：已使用</param>
+/// <param name="listSize">返回List的长度</param>
+/// <returns> ReturnType <see cref="ReturnType"/> </returns>
+ReturnType GetFileStatus(FILE *stream, int **sizeList, int **statusList, int *listSize);

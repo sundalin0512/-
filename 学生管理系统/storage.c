@@ -1,5 +1,6 @@
 #include "storage.h"
 
+#include "storageIO.h"
 
 /// <summary>
 /// 创建学生文档文件
@@ -17,6 +18,26 @@ ReturnType CreateStudentFile(char * fileName, size_t fileSize, char * preFileNam
 	}
 	FileClose(fp);
 	return RET_SUCCESS;
+}
+
+/// <summary>
+///	查询文件是否存在
+/// </summary>
+/// <param name="fileName">文件名</param>
+/// <returns>
+/// 存在,返回 <c>1</c> 不存在,返回 <c>0</c>
+/// </returns>
+int IsFileExist(char * fileName)
+{
+	FILE *fp = FileOpen(fileName);
+	int ret = 0;
+	if (fp != NULL)
+	{
+		ret = 1;
+		FileClose(fp);
+	}
+
+	return ret;
 }
 
 /// <summary>
