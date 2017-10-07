@@ -6,13 +6,16 @@ typedef struct Student
 {
 	char *ID;
 	char *name;
-	char *telephone;
+	char *sexual;
 	char *grade_C;
-	struct
+	union 
 	{
-		int year;
-		int month;
-		int day;
+		int data[3];
+		struct{
+			int year;
+			int month;
+			int day;
+		};
 	}Birthday;
 }Student;
 

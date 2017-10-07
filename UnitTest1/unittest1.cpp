@@ -563,13 +563,13 @@ namespace UnitTest1
 		{
 			student[0].ID = "2013084117";
 			student[0].name = "sundalin";
-			student[0].telephone = "18877776666";
+			student[0].sexual = "ÄĞ         ";
 			student[0].grade_C = "90";
 			student[0].Birthday = { 1993,5,12 };
 
 			student[1].ID = "2013081234";
 			student[1].name = "sssdalin";
-			student[1].telephone = "18822223333";
+			student[1].sexual = "Å®         ";
 			student[1].grade_C = "60";
 			student[1].Birthday = { 1995,2,18 };
 		}
@@ -635,9 +635,9 @@ namespace UnitTest1
 			{
 				Assert::AreEqual(student[0].name[i], tmpStudent.name[i]);
 			}
-			for (int i = 0; i < strlen(student[0].telephone) + 1; i++)
+			for (int i = 0; i < strlen(student[0].sexual) + 1; i++)
 			{
-				Assert::AreEqual(student[0].telephone[i], tmpStudent.telephone[i]);
+				Assert::AreEqual(student[0].sexual[i], tmpStudent.sexual[i]);
 			}
 			for (int i = 0; i < strlen(student[0].grade_C) + 1; i++)
 			{
@@ -666,9 +666,9 @@ namespace UnitTest1
 			{
 				Assert::AreEqual(student[0].name[i], tmpStudent.name[i]);
 			}
-			for (int i = 0; i < strlen(student[0].telephone) + 1; i++)
+			for (int i = 0; i < strlen(student[0].sexual) + 1; i++)
 			{
-				Assert::AreEqual(student[0].telephone[i], tmpStudent.telephone[i]);
+				Assert::AreEqual(student[0].sexual[i], tmpStudent.sexual[i]);
 			}
 			for (int i = 0; i < strlen(student[0].grade_C) + 1; i++)
 			{
@@ -707,9 +707,9 @@ namespace UnitTest1
 			{
 				Assert::AreEqual(student[0].name[i], tmpStudent.name[i]);
 			}
-			for (int i = 0; i < strlen(student[0].telephone) + 1; i++)
+			for (int i = 0; i < strlen(student[0].sexual) + 1; i++)
 			{
-				Assert::AreEqual(student[0].telephone[i], tmpStudent.telephone[i]);
+				Assert::AreEqual(student[0].sexual[i], tmpStudent.sexual[i]);
 			}
 			for (int i = 0; i < strlen(student[0].grade_C) + 1; i++)
 			{
@@ -736,9 +736,9 @@ namespace UnitTest1
 			{
 				Assert::AreEqual(student[0].name[i], tmpStudent.name[i]);
 			}
-			for (int i = 0; i < strlen(student[0].telephone) + 1; i++)
+			for (int i = 0; i < strlen(student[0].sexual) + 1; i++)
 			{
-				Assert::AreEqual(student[0].telephone[i], tmpStudent.telephone[i]);
+				Assert::AreEqual(student[0].sexual[i], tmpStudent.sexual[i]);
 			}
 			for (int i = 0; i < strlen(student[0].grade_C) + 1; i++)
 			{
@@ -777,9 +777,9 @@ namespace UnitTest1
 			{
 				Assert::AreEqual(student[0].name[i], tmpStudent.name[i]);
 			}
-			for (int i = 0; i < strlen(student[0].telephone) + 1; i++)
+			for (int i = 0; i < strlen(student[0].sexual) + 1; i++)
 			{
-				Assert::AreEqual(student[0].telephone[i], tmpStudent.telephone[i]);
+				Assert::AreEqual(student[0].sexual[i], tmpStudent.sexual[i]);
 			}
 			for (int i = 0; i < strlen(student[0].grade_C) + 1; i++)
 			{

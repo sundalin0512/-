@@ -72,3 +72,20 @@ ReturnType DeleteStudent(char *fileName, int index);
 /// <param name="newStudent">修改后的学生信息</param>
 /// <returns> ReturnType <see cref="ReturnType"/> </returns>
 ReturnType ModifyStudent(char *fileName, int index, Student *newStudent);
+
+/// <summary>
+/// 文件的使用信息
+/// </summary>
+/// <param name="fileName">文件名</param>
+/// <param name="sizeList">返回每个使用空间的长度</param>
+/// <param name="statusList">返回每个使用空间的状态 0：未使用 1：已使用</param>
+/// <param name="listSize">返回List的长度</param>
+/// <returns> ReturnType <see cref="ReturnType"/> </returns>
+ReturnType GetStudentFileStatus(char *fileName, int **sizeList, int **statusList, int *listSize);
+
+/// <summary>
+/// 碎片整理
+/// </summary>
+/// <param name="fileName">文件名</param>
+/// <returns> ReturnType <see cref="ReturnType"/> </returns>
+ReturnType FileDefragment(char *fileName);

@@ -61,7 +61,7 @@ ReturnType AddStudent(char * fileName, int index, Student * student)
 	}
 	size[0] = strnlen(student->ID, MAX_STR_LEN) + 1;
 	size[1] = strnlen(student->name, MAX_STR_LEN) + 1;
-	size[2] = strnlen(student->telephone, MAX_STR_LEN) + 1;
+	size[2] = strnlen(student->sexual, MAX_STR_LEN) + 1;
 	size[3] = strnlen(student->grade_C, MAX_STR_LEN) + 1;
 	size[4] = sizeof(student->Birthday);
 	bufferSize += size[0] + sizeof(size_t);
@@ -87,7 +87,7 @@ ReturnType AddStudent(char * fileName, int index, Student * student)
 
 	memcpy_s(buffer + bufferOffset, sizeof(size_t), &size[2], sizeof(size_t));
 	bufferOffset += sizeof(size_t);
-	memcpy_s(buffer + bufferOffset, size[2], student->telephone, size[2]);
+	memcpy_s(buffer + bufferOffset, size[2], student->sexual, size[2]);
 	bufferOffset += size[2];
 
 	memcpy_s(buffer + bufferOffset, sizeof(size_t), &size[3], sizeof(size_t));
@@ -99,7 +99,7 @@ ReturnType AddStudent(char * fileName, int index, Student * student)
 	bufferOffset += sizeof(size_t);
 	memcpy_s(buffer + bufferOffset, size[4], &student->Birthday, size[4]);
 	bufferOffset += size[4];
-	if(index >= 0)
+	if (index >= 0)
 	{
 		retValue = InsertData(fp, index, buffer, bufferSize);
 	}
@@ -140,7 +140,7 @@ int GetStudentSize(char * fileName)
 	{
 		return -1;
 	}
-	size =  GetDataNumber(fp);
+	size = GetDataNumber(fp);
 	FileClose(fp);
 	return size;
 }
@@ -184,8 +184,8 @@ ReturnType GetStudent(char * fileName, int index, Student * student)
 
 	memcpy_s(&size[2], sizeof(size_t), buffer + bufferOffset, sizeof(size_t));
 	bufferOffset += sizeof(size_t);
-	student->telephone = (char*)calloc(size[2], 1);
-	memcpy_s(student->telephone, size[2], buffer + bufferOffset, size[2]);
+	student->sexual = (char*)calloc(size[2], 1);
+	memcpy_s(student->sexual, size[2], buffer + bufferOffset, size[2]);
 	bufferOffset += size[2];
 
 	memcpy_s(&size[3], sizeof(size_t), buffer + bufferOffset, sizeof(size_t));
@@ -240,4 +240,35 @@ ReturnType ModifyStudent(char * fileName, int index, Student * newStudent)
 	}
 	AddStudent(fileName, index, newStudent);
 	return retValue;
+}
+
+/// <summary>
+/// 文件的使用信息
+/// </summary>
+/// <param name="fileName">文件名</param>
+/// <param name="sizeList">返回每个使用空间的长度</param>
+/// <param name="statusList">返回每个使用空间的状态 0：未使用 1：已使用</param>
+/// <param name="listSize">返回List的长度</param>
+/// <returns> ReturnType <see cref="ReturnType"/> </returns>
+ReturnType GetStudentFileStatus(char * fileName, int ** sizeList, int ** statusList, int * listSize)
+{
+	ReturnType retVal = RET_SUCCESS;
+	FILE *fp = FileOpen(fileName);
+	retVal = GetFileStatus(fp, sizeList, statusList, listSize);
+	FileClose(fp);
+	return retVal;
+}
+
+/// <summary>
+/// 碎片整理
+/// </summary>
+/// <param name="fileName">文件名</param>
+/// <returns> ReturnType <see cref="ReturnType"/> </returns>
+ReturnType FileDefragment(char * fileName)
+{
+	ReturnType retVal = RET_SUCCESS;
+	FILE *fp = FileOpen(fileName);
+	retVal = Defragment(fp);
+	FileClose(fp);
+	return retVal;
 }
