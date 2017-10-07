@@ -130,6 +130,7 @@ void OpenStudentFile()
 		PrintLine("文件大小（KB）:");
 		size = GetInputInt();
 		CreateStudentFile(fileName, size * 1024, NULL);
+		strcpy_s(g_currentFileName, MAX_STR_LEN, fileName);
 	}
 	else if (input == '2')
 	{

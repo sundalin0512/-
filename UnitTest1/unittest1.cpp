@@ -725,9 +725,9 @@ namespace UnitTest1
 			AddStudent(fileName, 0, &student[1]);
 			AddStudent(fileName, 1, &student[1]);
 			AddStudent(fileName, 1, &student[1]);
-			ModifyStudent(fileName, 2, &student[0]);
+			ModifyStudent(fileName, 0, &student[0]);
 			Student tmpStudent;
-			GetStudent(fileName, 2, &tmpStudent);
+			GetStudent(fileName, 0, &tmpStudent);
 			for (int i = 0; i < strlen(student[0].ID) + 1; i++)
 			{
 				Assert::AreEqual(student[0].ID[i], tmpStudent.ID[i]);

@@ -271,7 +271,6 @@ ReturnType InsertData(FILE *stream, const int index, const void *buffer, const s
 		// 写数据
 		writePosition += FileWrite(stream, writePosition, buffer, bytesToInsert);
 		{
-			// TODO: 
 			// 写已用节点
 			size_t writeSize = index *(sizeof(int) + sizeof(size_t)) + sizeof(size_t);
 			char *writeBuffer = (char*)usedList;
@@ -313,12 +312,26 @@ ReturnType InsertData(FILE *stream, const int index, const void *buffer, const s
 		// 写数据
 		FileWrite(stream, writePosition, buffer, writeLength);
 		// 写已用节点
-		insertOffset = writePosition;
-		writePosition = fileinfo->offsetUsed;
-		usedList->size += 1;
-		writePosition += FileWrite(stream, writePosition, usedList, usedListSize);
-		writePosition += FileWrite(stream, writePosition, &insertOffset, sizeof(size_t));
-		writePosition += FileWrite(stream, writePosition, &bytesToInsert, sizeof(size_t));
+		{
+			size_t writeSize = index *(sizeof(int) + sizeof(size_t)) + sizeof(size_t);
+			char *writeBuffer = (char*)usedList;
+			size_t usedListPosition = fileinfo->offsetUsed;
+			insertOffset = writePosition;
+			writePosition = fileinfo->offsetUsed;
+			usedList->size += 1;
+			writePosition += FileWrite(stream, writePosition, usedList, writeSize);
+			writeBuffer += writeSize;
+			writeSize = (usedList->size - index - 1) *(sizeof(int) + sizeof(size_t));
+			writePosition += FileWrite(stream, writePosition, &insertOffset, sizeof(size_t));
+			writePosition += FileWrite(stream, writePosition, &bytesToInsert, sizeof(size_t));
+			writePosition += FileWrite(stream, writePosition, writeBuffer, writeSize);
+			//insertOffset = writePosition;
+			//writePosition = fileinfo->offsetUsed;
+			//usedList->size += 1;
+			//writePosition += FileWrite(stream, writePosition, usedList, usedListSize);
+			//writePosition += FileWrite(stream, writePosition, &insertOffset, sizeof(size_t));
+			//writePosition += FileWrite(stream, writePosition, &bytesToInsert, sizeof(size_t));
+		}
 		// 写未用节点
 		fileinfo->offsetUnused = writePosition;
 		if (writeLength == freeSpaceLength)
