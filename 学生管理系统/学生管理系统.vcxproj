@@ -82,6 +82,7 @@
       <SDLCheck>false</SDLCheck>
       <EnablePREfast>true</EnablePREfast>
       <TreatWarningAsError>false</TreatWarningAsError>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
