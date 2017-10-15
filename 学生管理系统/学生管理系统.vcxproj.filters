@@ -32,19 +32,19 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="storageIO.c">
+    <ClCompile Include="storageIO.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="storage.c">
+    <ClCompile Include="storage.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="manage.c">
+    <ClCompile Include="manage.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="main.c">
+    <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="userInterface.c">
+    <ClCompile Include="userInterface.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

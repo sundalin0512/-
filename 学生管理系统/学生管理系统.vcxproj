@@ -129,11 +129,11 @@
     <ClInclude Include="userInterface.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.c" />
-    <ClCompile Include="manage.c" />
-    <ClCompile Include="storage.c" />
-    <ClCompile Include="storageIO.c" />
-    <ClCompile Include="userInterface.c" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="manage.cpp" />
+    <ClCompile Include="storage.cpp" />
+    <ClCompile Include="storageIO.cpp" />
+    <ClCompile Include="userInterface.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -155,7 +155,7 @@ int GetStudentSize(char * fileName)
 ReturnType GetStudent(char * fileName, int index, Student * student)
 {
 	char *buffer = NULL;
-	size_t bufferSize = NULL;
+	size_t bufferSize = 0;
 	size_t size[5] = { 0 };
 	size_t bufferOffset = 0;
 	ReturnType retValue = RET_SUCCESS;
