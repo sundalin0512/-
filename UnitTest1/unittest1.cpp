@@ -1,12 +1,10 @@
 #include "stdafx.h"
 #include "CppUnitTest.h"
-extern "C" {
 #include "storageIO.h"
 #include "storage.h"
-	extern size_t FileRead(FILE *stream, const size_t offsetFromFileStart, void *buffer, const size_t bytesToRead);
-	extern size_t FileWrite(FILE *stream, const size_t offsetFromFileStart, const void *buffer, const size_t bytesToWrite);
-	//extern ReturnType AddStudent(char *fileName, int index, Student *student);
-}
+extern size_t FileRead(FILE *stream, const size_t offsetFromFileStart, void *buffer, const size_t bytesToRead);
+extern size_t FileWrite(FILE *stream, const size_t offsetFromFileStart, const void *buffer, const size_t bytesToWrite);
+//extern ReturnType AddStudent(char *fileName, int index, Student *student);
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace UnitTest1
@@ -538,8 +536,8 @@ namespace UnitTest1
 			file.DeleteData(0);
 
 			file.Defragment();
-			int size[1] = { 0};
-			int used[1] = { 0};
+			int size[1] = { 0 };
+			int used[1] = { 0 };
 			int *sizeList;
 			int *statusList;
 			int ListSize;
@@ -559,6 +557,8 @@ namespace UnitTest1
 	public:
 		Student student[10];
 		char *fileName;
+		File file;
+		StudentFile	studentFile;
 		StorageTest()
 		{
 			student[0].ID = "2013084117";
@@ -580,14 +580,15 @@ namespace UnitTest1
 		TEST_METHOD(AddStudent_Test1)
 		{
 			fileName = "AddStudent_Test1.bin";
-			FILE *fp = CreateFile(fileName, 1000, nullptr);
-			FileClose(fp);
-			AddStudent(fileName, 0, &student[0]);
+			studentFile.SetStudentFile(fileName);
+			FILE *fp = file.CreateFile(fileName, 1000, nullptr);
+			file.FileClose();
+			studentFile.AddStudent(0, &student[0]);
 
-			fp = FileOpen(fileName);
+			fp = file.FileOpen(fileName);
 			char *buffer;
 			size_t size;
-			GetData((void**)&buffer, &size, 0);
+			file.GetData((void**)&buffer, &size, 0);
 
 			Assert::AreEqual(11, ((int*)buffer)[0]);
 			Assert::AreEqual(0x43, (int)size);
@@ -596,21 +597,22 @@ namespace UnitTest1
 		TEST_METHOD(AddStudent_Test2)
 		{
 			fileName = "AddStudent_Test2.bin";
-			FILE *fp = CreateFile(fileName, 1000, nullptr);
-			FileClose(fp);
-			AddStudent(fileName, 0, &student[0]);
-			AddStudent(fileName, 1, &student[0]);
+			studentFile.SetStudentFile(fileName);
+			FILE *fp = file.CreateFile(fileName, 1000, nullptr);
+			file.FileClose();
+			studentFile.AddStudent(0, &student[0]);
+			studentFile.AddStudent(1, &student[0]);
 
-			fp = FileOpen(fileName);
+			fp = file.FileOpen(fileName);
 			char *buffer;
 			size_t size;
-			GetData((void**)&buffer, &size, 0);
+			file.GetData((void**)&buffer, &size, 0);
 
 			Assert::AreEqual(11, ((int*)buffer)[0]);
 			Assert::AreEqual(0x43, (int)size);
 
 			free(buffer);
-			GetData((void**)&buffer, &size, 1);
+			file.GetData((void**)&buffer, &size, 1);
 
 			Assert::AreEqual(11, ((int*)buffer)[0]);
 			Assert::AreEqual(0x43, (int)size);
@@ -620,13 +622,14 @@ namespace UnitTest1
 		TEST_METHOD(GetStudent_Test1)
 		{
 			fileName = "GetStudent_Test1.bin";
-			FILE *fp = CreateFile(fileName, 1000, nullptr);
-			FileClose(fp);
-			AddStudent(fileName, 0, &student[1]);
-			AddStudent(fileName, 0, &student[0]);
+			studentFile.SetStudentFile(fileName);
+			FILE *fp = file.CreateFile(fileName, 1000, nullptr);
+			file.FileClose();
+			studentFile.AddStudent(0, &student[1]);
+			studentFile.AddStudent(0, &student[0]);
 
 			Student tmpStudent;
-			GetStudent(fileName, 0, &tmpStudent);
+			studentFile.GetStudent(0, &tmpStudent);
 			for (int i = 0; i < strlen(student[0].ID) + 1; i++)
 			{
 				Assert::AreEqual(student[0].ID[i], tmpStudent.ID[i]);
@@ -651,13 +654,14 @@ namespace UnitTest1
 		TEST_METHOD(GetStudent_Test2)
 		{
 			fileName = "GetStudent_Test2.bin";
-			FILE *fp = CreateFile(fileName, 1000, nullptr);
-			FileClose(fp);
-			AddStudent(fileName, 0, &student[0]);
-			AddStudent(fileName, 0, &student[0]);
+			studentFile.SetStudentFile(fileName);
+			FILE *fp = file.CreateFile(fileName, 1000, nullptr);
+			file.FileClose();
+			studentFile.AddStudent(0, &student[0]);
+			studentFile.AddStudent(0, &student[0]);
 
 			Student tmpStudent;
-			GetStudent(fileName, 1, &tmpStudent);
+			studentFile.GetStudent(1, &tmpStudent);
 			for (int i = 0; i < strlen(student[0].ID) + 1; i++)
 			{
 				Assert::AreEqual(student[0].ID[i], tmpStudent.ID[i]);
@@ -682,23 +686,25 @@ namespace UnitTest1
 		TEST_METHOD(GetStudent_Test3)
 		{
 			fileName = "GetStudent_Test3.bin";
-			FILE *fp = CreateFile(fileName, 1000, nullptr);
-			FileClose(fp);
-			AddStudent(fileName, 0, &student[0]);
+			studentFile.SetStudentFile(fileName);
+			FILE *fp = file.CreateFile(fileName, 1000, nullptr);
+			file.FileClose();
+			studentFile.AddStudent(0, &student[0]);
 
-			Assert::AreEqual((int)RET_ILLEGAL_INDEX, (int)AddStudent(fileName, 10, &student[0]));
+			Assert::AreEqual((int)RET_ILLEGAL_INDEX, (int)studentFile.AddStudent(10, &student[0]));
 		}
 
 		TEST_METHOD(DeleteStudent_Test1)
 		{
 			fileName = "DeleteStudent_Test1.bin";
-			FILE *fp = CreateFile(fileName, 1000, nullptr);
-			FileClose(fp);
-			AddStudent(fileName, 0, &student[1]);
-			AddStudent(fileName, 1, &student[0]);
-			DeleteStudent(fileName, 0);
+			studentFile.SetStudentFile(fileName);
+			FILE *fp = file.CreateFile(fileName, 1000, nullptr);
+			file.FileClose();
+			studentFile.AddStudent( 0, &student[1]);
+			studentFile.AddStudent( 1, &student[0]);
+			studentFile.DeleteStudent( 0);
 			Student tmpStudent;
-			GetStudent(fileName, 0, &tmpStudent);
+			studentFile.GetStudent( 0, &tmpStudent);
 			for (int i = 0; i < strlen(student[0].ID) + 1; i++)
 			{
 				Assert::AreEqual(student[0].ID[i], tmpStudent.ID[i]);
@@ -720,14 +726,15 @@ namespace UnitTest1
 		TEST_METHOD(ModifyStudent_Test1)
 		{
 			fileName = "ModifyStudent_Test1.bin";
-			FILE *fp = CreateFile(fileName, 1000, nullptr);
-			FileClose(fp);
-			AddStudent(fileName, 0, &student[1]);
-			AddStudent(fileName, 1, &student[1]);
-			AddStudent(fileName, 1, &student[1]);
-			ModifyStudent(fileName, 0, &student[0]);
+			studentFile.SetStudentFile(fileName);
+			FILE *fp = file.CreateFile(fileName, 1000, nullptr);
+			file.FileClose();
+			studentFile.AddStudent(0, &student[1]);
+			studentFile.AddStudent(1, &student[1]);
+			studentFile.AddStudent(1, &student[1]);
+			studentFile.ModifyStudent(0, &student[0]);
 			Student tmpStudent;
-			GetStudent(fileName, 0, &tmpStudent);
+			studentFile.GetStudent(0, &tmpStudent);
 			for (int i = 0; i < strlen(student[0].ID) + 1; i++)
 			{
 				Assert::AreEqual(student[0].ID[i], tmpStudent.ID[i]);
@@ -749,26 +756,27 @@ namespace UnitTest1
 		TEST_METHOD(AppendStudent_Test1)
 		{
 			fileName = "AppendStudent_Test1.bin";
-			FILE *fp = CreateFile(fileName, 1000, nullptr);
-			FileClose(fp);
-			AppendStudent(fileName, &student[1]);
-			AppendStudent(fileName, &student[1]);
-			AppendStudent(fileName, &student[0]);
-			AppendStudent(fileName, &student[1]);
-			AppendStudent(fileName, &student[0]);
-			AppendStudent(fileName, &student[0]);
-			AppendStudent(fileName, &student[1]);
-			AppendStudent(fileName, &student[0]);
-			DeleteStudent(fileName, 0);
-			DeleteStudent(fileName, 0);
-			DeleteStudent(fileName, 0);
-			DeleteStudent(fileName, 0);
-			DeleteStudent(fileName, 0);
-			DeleteStudent(fileName, 0);
+			studentFile.SetStudentFile(fileName);
+			FILE *fp = file.CreateFile(fileName, 1000, nullptr);
+			file.FileClose();
+			studentFile.AppendStudent(&student[1]);
+			studentFile.AppendStudent(&student[1]);
+			studentFile.AppendStudent(&student[0]);
+			studentFile.AppendStudent(&student[1]);
+			studentFile.AppendStudent(&student[0]);
+			studentFile.AppendStudent(&student[0]);
+			studentFile.AppendStudent(&student[1]);
+			studentFile.AppendStudent(&student[0]);
+			studentFile.DeleteStudent(0);
+			studentFile.DeleteStudent(0);
+			studentFile.DeleteStudent(0);
+			studentFile.DeleteStudent(0);
+			studentFile.DeleteStudent(0);
+			studentFile.DeleteStudent(0);
 
 
 			Student tmpStudent;
-			GetStudent(fileName, 1, &tmpStudent);
+			studentFile.GetStudent(1, &tmpStudent);
 			for (int i = 0; i < strlen(student[0].ID) + 1; i++)
 			{
 				Assert::AreEqual(student[0].ID[i], tmpStudent.ID[i]);
@@ -790,41 +798,42 @@ namespace UnitTest1
 		TEST_METHOD(GetStudentSize_Test1)
 		{
 			fileName = "GetStudentSize_Test1.bin";
-			FILE *fp = CreateFile(fileName, 1000, nullptr);
-			FileClose(fp);
-			AppendStudent(fileName, &student[1]);
-			Assert::AreEqual(1, (int)GetStudentSize("GetStudentSize_Test1.bin"));
-			AppendStudent(fileName, &student[1]);
-			Assert::AreEqual(2, (int)GetStudentSize("GetStudentSize_Test1.bin"));
-			AppendStudent(fileName, &student[0]);
-			Assert::AreEqual(3, (int)GetStudentSize("GetStudentSize_Test1.bin"));
-			AppendStudent(fileName, &student[1]);
-			Assert::AreEqual(4, (int)GetStudentSize("GetStudentSize_Test1.bin"));
-			AppendStudent(fileName, &student[0]);
-			Assert::AreEqual(5, (int)GetStudentSize("GetStudentSize_Test1.bin"));
-			AppendStudent(fileName, &student[0]);
-			Assert::AreEqual(6, (int)GetStudentSize("GetStudentSize_Test1.bin"));
-			AppendStudent(fileName, &student[1]);
-			Assert::AreEqual(7, (int)GetStudentSize("GetStudentSize_Test1.bin"));
-			AppendStudent(fileName, &student[0]);
-			Assert::AreEqual(8, (int)GetStudentSize("GetStudentSize_Test1.bin"));
+			studentFile.SetStudentFile(fileName);
+			FILE *fp = file.CreateFile(fileName, 1000, nullptr);
+			file.FileClose();
+			studentFile.AppendStudent( &student[1]);
+			Assert::AreEqual(1, (int)studentFile.GetStudentSize());
+			studentFile.AppendStudent( &student[1]);
+			Assert::AreEqual(2, (int)studentFile.GetStudentSize());
+			studentFile.AppendStudent( &student[0]);
+			Assert::AreEqual(3, (int)studentFile.GetStudentSize());
+			studentFile.AppendStudent( &student[1]);
+			Assert::AreEqual(4, (int)studentFile.GetStudentSize());
+			studentFile.AppendStudent( &student[0]);
+			Assert::AreEqual(5, (int)studentFile.GetStudentSize());
+			studentFile.AppendStudent( &student[0]);
+			Assert::AreEqual(6, (int)studentFile.GetStudentSize());
+			studentFile.AppendStudent( &student[1]);
+			Assert::AreEqual(7, (int)studentFile.GetStudentSize());
+			studentFile.AppendStudent( &student[0]);
+			Assert::AreEqual(8, (int)studentFile.GetStudentSize());
 
-			DeleteStudent(fileName, 0);
-			Assert::AreEqual(7, (int)GetStudentSize("GetStudentSize_Test1.bin"));
-			DeleteStudent(fileName, 0);
-			Assert::AreEqual(6, (int)GetStudentSize("GetStudentSize_Test1.bin"));
-			DeleteStudent(fileName, 0);
-			Assert::AreEqual(5, (int)GetStudentSize("GetStudentSize_Test1.bin"));
-			DeleteStudent(fileName, 0);
-			Assert::AreEqual(4, (int)GetStudentSize("GetStudentSize_Test1.bin"));
-			DeleteStudent(fileName, 0);
-			Assert::AreEqual(3, (int)GetStudentSize("GetStudentSize_Test1.bin"));
-			DeleteStudent(fileName, 0);
-			Assert::AreEqual(2, (int)GetStudentSize("GetStudentSize_Test1.bin"));
-			DeleteStudent(fileName, 0);
-			Assert::AreEqual(1, (int)GetStudentSize("GetStudentSize_Test1.bin"));
-			DeleteStudent(fileName, 0);
-			Assert::AreEqual(0, (int)GetStudentSize("GetStudentSize_Test1.bin"));
+			studentFile.DeleteStudent( 0);
+			Assert::AreEqual(7, (int)studentFile.GetStudentSize());
+			studentFile.DeleteStudent( 0);
+			Assert::AreEqual(6, (int)studentFile.GetStudentSize());
+			studentFile.DeleteStudent( 0);
+			Assert::AreEqual(5, (int)studentFile.GetStudentSize());
+			studentFile.DeleteStudent( 0);
+			Assert::AreEqual(4, (int)studentFile.GetStudentSize());
+			studentFile.DeleteStudent( 0);
+			Assert::AreEqual(3, (int)studentFile.GetStudentSize());
+			studentFile.DeleteStudent( 0);
+			Assert::AreEqual(2, (int)studentFile.GetStudentSize());
+			studentFile.DeleteStudent( 0);
+			Assert::AreEqual(1, (int)studentFile.GetStudentSize());
+			studentFile.DeleteStudent( 0);
+			Assert::AreEqual(0, (int)studentFile.GetStudentSize());
 		}
 	};
 }

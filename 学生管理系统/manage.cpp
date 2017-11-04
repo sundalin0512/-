@@ -3,7 +3,8 @@
 #include "storage.h"
 #include "userInterface.h"
 
-static char g_currentFileName[MAX_STR_LEN];
+//static char g_currentFileName[MAX_STR_LEN];
+StudentFile studentFile;
 
 int MainLoop()
 {
@@ -114,9 +115,9 @@ void OpenStudentFile()
 	{
 		PrintLine("请输入文件名:");
 		GetInputString(fileName);
-		if (IsFileExist(fileName))
+		if (studentFile.IsFileExist(fileName))
 		{
-			strcpy_s(g_currentFileName, MAX_STR_LEN, fileName);
+			studentFile.SetStudentFile(fileName);
 		}
 		else
 		{
@@ -129,8 +130,8 @@ void OpenStudentFile()
 		GetInputString(fileName);
 		PrintLine("文件大小（KB）:");
 		size = GetInputInt();
-		CreateStudentFile(fileName, size * 1024, NULL);
-		strcpy_s(g_currentFileName, MAX_STR_LEN, fileName);
+		studentFile.CreateStudentFile(fileName, size * 1024, NULL);
+		studentFile.SetStudentFile(fileName);
 	}
 	else if (input == '2')
 	{
@@ -204,7 +205,7 @@ void AddStudentInfo()
 	SetBirthday(&student);
 	SetCGrade(&student);
 
-	AppendStudent(g_currentFileName, &student);
+	studentFile.AppendStudent(&student);
 
 	GetInputChar();
 }
@@ -216,7 +217,7 @@ void DeleteStudentInfo()
 	ClearScreen();
 	PrintLine("要删除第几个学生:");
 	tmpInt = GetInputInt();
-	retValue = DeleteStudent(g_currentFileName, tmpInt);
+	retValue = studentFile.DeleteStudent(tmpInt);
 	if (retValue == RET_SUCCESS)
 	{
 		PrintLine("删除成功");
@@ -240,7 +241,7 @@ void ModifyStudentInfo()
 	ClearScreen();
 	PrintLine("要修改第几个学生:");
 	index = GetInputInt();
-	retVal = GetStudent(g_currentFileName, index, &student);
+	retVal = studentFile.GetStudent(index, &student);
 	if (retVal != RET_SUCCESS)
 	{
 		PrintLine("404");
@@ -276,7 +277,7 @@ void ModifyStudentInfo()
 	{
 		SetCGrade(&student);
 	}
-	retVal = ModifyStudent(g_currentFileName, index, &student);
+	retVal = studentFile.ModifyStudent(index, &student);
 	if (retVal == RET_SUCCESS)
 	{
 		PrintLine("修改成功");
@@ -295,7 +296,7 @@ void QueryStudentInfo()
 	char tmpStr[MAX_STR_LEN] = "";
 	int tmpInt = 0;
 	int dayChoose = 0;
-	int studentSize = GetStudentSize(g_currentFileName);
+	int studentSize = studentFile.GetStudentSize();
 	Student student;
 	ClearScreen();
 	PrintLine("要查询的项目：");
@@ -310,7 +311,8 @@ void QueryStudentInfo()
 		PrintLine("1: 年");
 		PrintLine("2: 月");
 		PrintLine("3: 日");
-		dayChoose = atoi(GetInputChar());
+		GetInputString(tmpStr);
+		dayChoose = atoi(tmpStr);
 		if (dayChoose > 3 || dayChoose <= 0)
 		{
 			PrintLine("出错啦");
@@ -328,7 +330,7 @@ void QueryStudentInfo()
 	for (int i = 0; i < studentSize; i++)
 	{
 
-		GetStudent(g_currentFileName, i, &student);
+		studentFile.GetStudent(i, &student);
 		switch (tmpChar)
 		{
 		case '1':
@@ -369,7 +371,7 @@ void QueryStudentInfo()
 
 void GradeStatistic()
 {
-	int studentSize = GetStudentSize(g_currentFileName);
+	int studentSize = studentFile.GetStudentSize();
 	double totalGrade = 0.0;
 	double averageGrade = 0.0;
 	double maxGrade = 0.0;
@@ -378,7 +380,7 @@ void GradeStatistic()
 	for (int i = 0; i < studentSize; i++)
 	{
 		double grade = 0.0;
-		GetStudent(g_currentFileName, i, &student);
+		studentFile.GetStudent(i, &student);
 		grade = atof(student.grade_C);
 		if (maxGrade < grade)
 		{
@@ -399,15 +401,15 @@ void ShowStorageInfo()
 {
 	int *sizeList = NULL;
 	int *statusList = NULL;
-	int *listSize = 0;
-	GetStudentFileStatus(g_currentFileName, &sizeList, &statusList, &listSize);
+	int listSize = 0;
+	studentFile.GetStudentFileStatus(&sizeList, &statusList, &listSize);
 	ShowStudentFileStatus(sizeList, statusList, listSize);
 	GetInputChar();
 }
 
 void DefragmentFile()
 {
-	if (FileDefragment(g_currentFileName) == RET_SUCCESS)
+	if (studentFile.FileDefragment() == RET_SUCCESS)
 	{
 		PrintLine("碎片整理完成");
 	}
@@ -420,12 +422,12 @@ void DefragmentFile()
 
 void ShowAllInfo()
 {
-	int studentSize = GetStudentSize(g_currentFileName);
+	int studentSize = studentFile.GetStudentSize();
 	Student student;
 	PrintStudentHelpInfo();
 	for (int i = 0; i < studentSize; i++)
 	{
-		GetStudent(g_currentFileName, i, &student);
+		studentFile.GetStudent(i, &student);
 		PrintStudent(student, i);
 	}
 	GetInputChar();

@@ -66,7 +66,6 @@ public:
 		return bytesHasRead;
 	}
 
-private:
 	/// <summary>
 	/// 获取文件信息
 	/// </summary>
@@ -76,7 +75,6 @@ private:
 		FileRead(0, &fileinfo, sizeof(FileInfo));
 	}
 
-public:
 	/// <summary>
 	/// 创建文件，返回文件指针
 	/// </summary>
