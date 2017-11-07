@@ -10,17 +10,17 @@ class StudentFile
 {
 private:
 	File file;
-	char *fileName;
+	char *m_fileName;
 public:
 	StudentFile()
 	{
-		fileName = nullptr;
+		m_fileName = nullptr;
 	}
 	~StudentFile()
 	{
-		if (fileName != nullptr)
+		if (m_fileName != nullptr)
 		{
-			delete fileName;
+			delete m_fileName;
 		}
 	}
 	/// <summary>
@@ -50,11 +50,11 @@ public:
 	{
 		if (fileName != nullptr)
 		{
-			delete fileName;
+			delete m_fileName;
 		}
-		fileName = new char[strlen(fileName) + 1];
-		strcpy(this->fileName, fileName);
-		FILE *fp = file.FileOpen(fileName);
+		m_fileName = new char[strlen(fileName) + 1];
+		strcpy(this->m_fileName, fileName);
+		FILE *fp = file.FileOpen(m_fileName);
 		if (fp == NULL)
 		{
 			return RET_ERROR;
@@ -97,7 +97,7 @@ public:
 		size_t size[5] = { 0 };
 		size_t bufferOffset = 0;
 		ReturnType retValue = RET_SUCCESS;
-		FILE* fp = file.FileOpen(fileName);
+		FILE* fp = file.FileOpen(m_fileName);
 		if (fp == NULL)
 		{
 			return RET_ERROR;
@@ -178,7 +178,7 @@ public:
 	int GetStudentSize()
 	{
 		int size = 0;
-		FILE *fp = file.FileOpen(fileName);
+		FILE *fp = file.FileOpen(m_fileName);
 		if (fp == NULL)
 		{
 			return -1;
@@ -202,7 +202,7 @@ public:
 		size_t size[5] = { 0 };
 		size_t bufferOffset = 0;
 		ReturnType retValue = RET_SUCCESS;
-		FILE* fp = file.FileOpen(fileName);
+		FILE* fp = file.FileOpen(m_fileName);
 		if (fp == NULL)
 		{
 			return RET_ERROR;
@@ -256,7 +256,7 @@ public:
 	ReturnType DeleteStudent(int index)
 	{
 		ReturnType retValue = RET_SUCCESS;
-		FILE* fp = file.FileOpen(fileName);
+		FILE* fp = file.FileOpen(m_fileName);
 		if (fp == NULL)
 		{
 			return RET_ERROR;
@@ -296,7 +296,7 @@ public:
 	ReturnType GetStudentFileStatus(int ** sizeList, int ** statusList, int * listSize)
 	{
 		ReturnType retVal = RET_SUCCESS;
-		FILE *fp = file.FileOpen(fileName);
+		FILE *fp = file.FileOpen(m_fileName);
 		retVal = file.GetFileStatus(sizeList, statusList, listSize);
 		file.FileClose();
 		return retVal;
@@ -310,7 +310,7 @@ public:
 	ReturnType FileDefragment()
 	{
 		ReturnType retVal = RET_SUCCESS;
-		FILE *fp = file.FileOpen(fileName);
+		FILE *fp = file.FileOpen(m_fileName);
 		retVal = file.Defragment();
 		file.FileClose();
 		return retVal;

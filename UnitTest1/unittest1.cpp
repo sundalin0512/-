@@ -2,9 +2,7 @@
 #include "CppUnitTest.h"
 #include "storageIO.h"
 #include "storage.h"
-extern size_t FileRead(FILE *stream, const size_t offsetFromFileStart, void *buffer, const size_t bytesToRead);
-extern size_t FileWrite(FILE *stream, const size_t offsetFromFileStart, const void *buffer, const size_t bytesToWrite);
-//extern ReturnType AddStudent(char *fileName, int index, Student *student);
+
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace UnitTest1
@@ -52,15 +50,15 @@ namespace UnitTest1
 
 			char szTest[] = "00000000""\0""11111111";
 			char *buffer = new char[sizeof(szTest)];
-			file.FileRead(0x60, buffer, sizeof(szTest));
+			file.FileRead(sizeof(FileInfo), buffer, sizeof(szTest));
 			for (int i = 0; i < sizeof(szTest); i++)
 			{
 				Assert::AreEqual(szTest[i], buffer[i]);
 			}
 			FileInfo fileinfo;
 			file.FileRead(0, &fileinfo, sizeof(fileinfo));
-			Assert::AreEqual(size_t(0x60 + 18), fileinfo.offsetUsed);
-			Assert::AreEqual(size_t(0x60 + 18 + 20), fileinfo.offsetUnused);
+			Assert::AreEqual(size_t(sizeof(FileInfo) + 18), fileinfo.offsetUsed);
+			Assert::AreEqual(size_t(sizeof(FileInfo) + 18 + 20), fileinfo.offsetUnused);
 		}
 
 		TEST_METHOD(DeleteData_Test1)
@@ -72,15 +70,15 @@ namespace UnitTest1
 
 			char szTest[] = "00000000""\0""11111111";
 			char *buffer = new char[sizeof(szTest)];
-			file.FileRead(0x60, buffer, sizeof(szTest));
+			file.FileRead(sizeof(FileInfo), buffer, sizeof(szTest));
 			for (int i = 0; i < sizeof(szTest); i++)
 			{
 				Assert::AreEqual(szTest[i], buffer[i]);
 			}
 			FileInfo fileinfo;
 			file.FileRead(0, &fileinfo, sizeof(fileinfo));
-			Assert::AreEqual(size_t(0x60 + 18), fileinfo.offsetUsed);
-			Assert::AreEqual(size_t(0x60 + 18 + 20), fileinfo.offsetUnused);
+			Assert::AreEqual(size_t(sizeof(FileInfo) + 18), fileinfo.offsetUsed);
+			Assert::AreEqual(size_t(sizeof(FileInfo) + 18 + 20), fileinfo.offsetUnused);
 		}
 
 		TEST_METHOD(Defragment_Test1)
@@ -124,7 +122,7 @@ namespace UnitTest1
 
 			file.Defragment();
 			int buffer[2];
-			file.FileRead(0x60, buffer, 2 * sizeof(size_t));
+			file.FileRead(sizeof(FileInfo), buffer, 2 * sizeof(size_t));
 			Assert::AreEqual(0, buffer[1]);
 			Assert::AreEqual(0, buffer[0]);
 
@@ -167,15 +165,15 @@ namespace UnitTest1
 			file.Defragment();
 			char szTest[] = "00000000000000000\00011111111111111111\0002222222222222222222222222222\00066666666666666666666\0008888888888888888888888888888888888888888888";
 			char *buffer = new char[sizeof(szTest)];
-			file.FileRead(0x60, buffer, sizeof(szTest));
+			file.FileRead(sizeof(FileInfo), buffer, sizeof(szTest));
 			for (int i = 0; i < sizeof(szTest); i++)
 			{
 				Assert::AreEqual(szTest[i], buffer[i]);
 			}
 			FileInfo fileinfo;
 			file.FileRead(0, &fileinfo, sizeof(fileinfo));
-			Assert::AreEqual(size_t(0x60 + 130), fileinfo.offsetUsed);
-			Assert::AreEqual(size_t(0x60 + 130 + 44), fileinfo.offsetUnused);
+			Assert::AreEqual(size_t(sizeof(FileInfo) + 130), fileinfo.offsetUsed);
+			Assert::AreEqual(size_t(sizeof(FileInfo) + 130 + 44), fileinfo.offsetUnused);
 		}
 
 		TEST_METHOD(GetData_Test1)

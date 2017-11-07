@@ -14,7 +14,7 @@ typedef struct FileInfo
 	char preFileName[0x20];		// 0x30 上一个文件相对目录
 	size_t offsetUsed;			// 0x50 已用节点偏移，在未用节点前
 	size_t offsetUnused;		// 0x54 未用节点偏移，在已用节点后
-	int reserved[2];			// 0x58 保留
+	int reserved[6];			// 0x58 保留
 	//void *data;				// 0x60 数据
 }FileInfo;
 
@@ -84,17 +84,17 @@ public:
 	/// <returns>创建的文件指针，失败返回空指针</returns>
 	FILE *CreateFile(const char *fileName, const size_t sizeBytes, const char *preFileName)
 	{
-		if (sizeBytes > 0x68)
+		if (sizeBytes > sizeof(FileInfo)+8)
 		{
 			fileinfo = {
 				sizeBytes,
-				0x60,
+				sizeof(FileInfo),
 				0,
 				0,
 				"",
 				"",
-				0x60,
-				0x64,
+				sizeof(FileInfo),
+				sizeof(FileInfo)+4,
 				0,0
 			};
 			fopen_s(&stream, fileName, "wb+");
@@ -116,7 +116,7 @@ public:
 				preFile.FileWrite(0, &preFile.fileinfo, sizeof(preFile.fileinfo));
 				preFile.FileClose();
 			}
-			void *data = calloc(sizeBytes - 0x60, 1);
+			void *data = calloc(sizeBytes - sizeof(FileInfo), 1);
 			if (data == NULL)
 			{
 				FileClose();
@@ -124,8 +124,8 @@ public:
 			}
 			((int*)data)[0] = 0;
 			((int*)data)[1] = 0;
-			FileWrite(0, &fileinfo, 0x60);
-			FileWrite(0x60, data, sizeBytes - 0x60);
+			FileWrite(0, &fileinfo, sizeof(FileInfo));
+			FileWrite(sizeof(FileInfo), data, sizeBytes - sizeof(FileInfo));
 			free(data);
 			return stream;
 		}
